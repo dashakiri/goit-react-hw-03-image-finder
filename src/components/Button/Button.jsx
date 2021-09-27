@@ -1,7 +1,9 @@
+import { ButtonLoadMore } from "./LoadMoreButton";
+
 export function LoadMoreButton({ onClick }) {
   return (
-    <button type="button" onClick={onClick}>
+    <ButtonLoadMore type="button" onClick={onClick}>
       Load more
-    </button>
+    </ButtonLoadMore>
   );
 }

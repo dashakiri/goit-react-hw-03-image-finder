@@ -1,12 +1,16 @@
 import { Component } from "react";
 import { ImageGalleryItem } from "../ImageGalleryItem/ImageGalleryItem";
 import { ContentLoader } from "../Loader/Loader";
+import { FetchImages } from "../FetchImages/FetchImages";
 import { LoadMoreButton } from "../Button/Button";
+import { GalleryList } from "../ImageGalleryItem/ImageGalleryItem.styled";
+import { Modal } from "../Modal/Modal";
 
 export class ImageGallery extends Component {
   state = {
     images: [],
     page: 1,
+    largeImageURL: null,
     status: "idle",
   };
 
@@ -18,27 +22,28 @@ export class ImageGallery extends Component {
     const { page } = this.state;
 
     if (currentQuery !== prevQuery || prevPage !== currentPage) {
-      fetch(
-        `https://pixabay.com/api/?key=22675606-31d87174acbb5d82d82bc8eb4&q=${currentQuery}&page=${page}&image_type=photo&orientation=horizontal&per_page=20`
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.totalHits === 0) {
-            return this.setState({ status: "rejected" });
-          }
+      FetchImages(currentQuery, page).then((data) => {
+        if (data.totalHits === 0) {
+          return this.setState({ status: "rejected" });
+        }
 
-          if (this.state.page === 1) {
-            this.setState({ status: "pending" });
-            return this.setState({ images: data.hits, status: "resolved" });
-          }
+        if (this.state.page === 1) {
+          this.setState({ status: "pending" });
+          return this.setState({ images: data.hits, status: "resolved" });
+        }
 
-          if (this.state.page > 1) {
-            return this.setState((prevState) => ({
-              images: [...prevState.images, ...data.hits],
-              status: "resolved",
-            }));
-          }
-        });
+        if (this.state.page > 1) {
+          window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: "smooth",
+          });
+
+          return this.setState((prevState) => ({
+            images: [...prevState.images, ...data.hits],
+            status: "resolved",
+          }));
+        }
+      });
     }
   }
 
@@ -48,8 +53,12 @@ export class ImageGallery extends Component {
     return;
   };
 
+  onModalClose = () => {
+    this.setState({ largeImageURL: null });
+  };
+
   render() {
-    const { status } = this.state;
+    const { status, images, largeImageURL } = this.state;
 
     if (status === "idle") {
       return <p>Пожалуйста, введите поисковый запрос.</p>;
@@ -61,10 +70,30 @@ export class ImageGallery extends Component {
 
     if (status === "resolved") {
       return (
-        <div>
-          <ImageGalleryItem images={this.state.images} />
+        <GalleryList>
+          {images.map(({ id, webformatURL, tags, largeImageURL }) => {
+            return (
+              <ImageGalleryItem
+                key={id}
+                webformatURL={webformatURL}
+                tags={tags}
+                largeImageURL={largeImageURL}
+                onClick={() => {
+                  this.setState({ largeImageURL: largeImageURL });
+                }}
+              />
+            );
+          })}
+
+          {largeImageURL && (
+            <Modal
+              largeImageUrl={largeImageURL}
+              onModalClose={this.onModalClose}
+            />
+          )}
+
           <LoadMoreButton onClick={this.handleLoadMoreBtnClick} />
-        </div>
+        </GalleryList>
       );
     }
 
