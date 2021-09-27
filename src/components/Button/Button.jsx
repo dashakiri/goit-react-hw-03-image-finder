@@ -1,4 +1,4 @@
-import { ButtonLoadMore } from "./LoadMoreButton";
+import { ButtonLoadMore } from "./LoadMoreButton.styled";
 
 export function LoadMoreButton({ onClick }) {
   return (

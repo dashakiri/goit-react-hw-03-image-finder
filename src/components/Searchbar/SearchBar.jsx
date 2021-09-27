@@ -1,6 +1,6 @@
 import { Component } from "react";
 import { toast } from "react-toastify";
-import { Header, Form, Input, Button } from "./SearchBar.js";
+import { Header, Form, Input, Button } from "./SearchBar.styled";
 
 export class SearchBar extends Component {
   state = {
