@@ -1,7 +1,7 @@
 import { Component } from "react";
 import { ImageGalleryItem } from "../ImageGalleryItem/ImageGalleryItem";
 import { ContentLoader } from "../Loader/Loader";
-import { FetchImages } from "../FetchImages/FetchImages";
+import { FetchImages } from "../../services/FetchImages/FetchImages";
 import { LoadMoreButton } from "../Button/Button";
 import { GalleryList } from "../ImageGalleryItem/ImageGalleryItem.styled";
 import { Modal } from "../Modal/Modal";
