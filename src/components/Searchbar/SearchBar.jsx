@@ -1,39 +1,29 @@
 import { Component } from "react";
-import { toast } from "react-toastify";
 import { Header, Form, Input, Button } from "./SearchBar.styled";
 
 export class SearchBar extends Component {
-  state = {
-    searchQuery: "",
-  };
+  constructor(props) {
+    super(props);
+
+    this.handleInputChange = this.handleInputChange.bind(this);
+  }
 
   handleInputChange = (e) => {
-    this.setState({ searchQuery: e.currentTarget.value.toLowerCase() });
-  };
-
-  handleSubmit = (e) => {
     e.preventDefault();
-
-    if (this.state.searchQuery.trim() === "") {
-      toast.warn("Введите поисковый запрос");
-      return;
-    }
-
-    this.props.onSubmit(this.state.searchQuery);
-    this.setState({ searchQuery: "" });
+    this.props.handleSubmittedForm(e.currentTarget.elements.query.value);
+    e.currentTarget.elements.query.value = "";
   };
 
   render() {
     return (
       <Header>
-        <Form onSubmit={this.handleSubmit}>
+        <Form onSubmit={this.handleInputChange}>
           <Input
             type="text"
+            name="query"
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
-            value={this.state.searchQuery}
-            onChange={this.handleInputChange}
           />
 
           <Button type="submit">

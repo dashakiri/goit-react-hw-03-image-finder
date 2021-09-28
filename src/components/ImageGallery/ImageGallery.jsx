@@ -4,15 +4,21 @@ import { ContentLoader } from "../Loader/Loader";
 import { FetchImages } from "../../services/FetchImages/FetchImages";
 import { LoadMoreButton } from "../Button/Button";
 import { GalleryList } from "../ImageGalleryItem/ImageGalleryItem.styled";
-import { Modal } from "../Modal/Modal";
+import { toast } from "react-toastify";
 
 export class ImageGallery extends Component {
-  state = {
-    images: [],
-    page: 1,
-    largeImageURL: null,
-    status: "idle",
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      images: [],
+      page: 1,
+      status: "idle",
+    };
+
+    this.handleLoadMoreBtnClick = this.handleLoadMoreBtnClick.bind(this);
+    this.onScroll = this.onScroll.bind(this);
+  }
 
   componentDidUpdate(prevProps, prevState) {
     const currentQuery = this.props.searchQuery;
@@ -27,17 +33,12 @@ export class ImageGallery extends Component {
           return this.setState({ status: "rejected" });
         }
 
-        if (this.state.page === 1) {
-          this.setState({ status: "pending" });
+        if (page === 1) {
           return this.setState({ images: data.hits, status: "resolved" });
         }
 
-        if (this.state.page > 1) {
-          window.scrollTo({
-            top: document.documentElement.scrollHeight,
-            behavior: "smooth",
-          });
-
+        if (page > 1) {
+          this.onScroll();
           return this.setState((prevState) => ({
             images: [...prevState.images, ...data.hits],
             status: "resolved",
@@ -47,18 +48,21 @@ export class ImageGallery extends Component {
     }
   }
 
+  onScroll() {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  }
+
   handleLoadMoreBtnClick = (e) => {
     e.preventDefault();
     this.setState((prevState) => ({ page: prevState.page + 1 }));
     return;
   };
 
-  onModalClose = () => {
-    this.setState({ largeImageURL: null });
-  };
-
   render() {
-    const { status, images, largeImageURL } = this.state;
+    const { status, images } = this.state;
 
     if (status === "idle") {
       return <p>Пожалуйста, введите поисковый запрос.</p>;
@@ -78,19 +82,10 @@ export class ImageGallery extends Component {
                 webformatURL={webformatURL}
                 tags={tags}
                 largeImageURL={largeImageURL}
-                onClick={() => {
-                  this.setState({ largeImageURL: largeImageURL });
-                }}
+                handleSelectedImage={this.props.handleSelectedImage}
               />
             );
           })}
-
-          {largeImageURL && (
-            <Modal
-              largeImageUrl={largeImageURL}
-              onModalClose={this.onModalClose}
-            />
-          )}
 
           <LoadMoreButton onClick={this.handleLoadMoreBtnClick} />
         </GalleryList>
@@ -98,7 +93,9 @@ export class ImageGallery extends Component {
     }
 
     if (status === "rejected") {
-      return <p>Изображения с именем {this.props.searchQuery} не найдены!</p>;
+      return toast.error(
+        `Изображения с именем ${this.props.searchQuery} не найдены!`
+      );
     }
   }
 }

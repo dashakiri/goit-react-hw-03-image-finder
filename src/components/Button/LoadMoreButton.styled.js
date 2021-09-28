@@ -1,20 +1,26 @@
 import styled from "@emotion/styled";
 
 export const ButtonLoadMore = styled.button`
-  display: flex;
-  justify-content: center;
-  width: 150px;
-  wight: 35px;
   margin: 0 auto;
+  padding: 8px 16px;
+  display: inline-block;
+  width: 180px;
 
-  background-color: white;
-  border: 1px solid grey;
-  border-radius: 7%;
+  border: 0;
+  border-radius: 2px;
+  background-color: lightgrey;
+
+  color: graphit;
+  text-decoration: none;
+  text-align: center;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 500;
+
+  cursor: pointer;
 
   &:hover,
   &:focus {
-    background-color: grey;
     border: 1px solid white;
-    cursor: pointer;
   }
 `;
